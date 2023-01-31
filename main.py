@@ -4,7 +4,7 @@ import sys
 from io import BytesIO
 from enum import Enum
 from PyQt5.QtWidgets import (QApplication, QMainWindow)
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtNetwork import *
 from PyQt5.QtCore import QUrl
 from PyQt5 import uic
@@ -30,11 +30,12 @@ class MainWindow(QMainWindow):
 
     def initUI(self):
         # "self.api_key": os.getenv('API_KEY') - получить апи
+        self.setFixedSize(1080, 720)
         self.map_api_server = "https://static-maps.yandex.ru/1.x/"
         self.map_params = {
             "ll": "40.984110,56.985042",
             "l": "map",
-            "spn": "0.001,0.001"
+            "spn": "0.002,0.002"
         }
         url = QUrl(self.parse_dict_to_url(ApiCategory.STATIC_MAP))
         req = QNetworkRequest(url)
@@ -55,9 +56,10 @@ class MainWindow(QMainWindow):
         er = reply.error()
         if er == QNetworkReply.NoError:
             bytes_string = reply.readAll()
-            image = Image.open(BytesIO(bytes_string))
-            image.save('map.png')
-            pixmap = QPixmap('map.png')
+            img = QImage()
+            img.loadFromData(bytes_string)
+            pixmap = QPixmap.fromImage(img)
+            pixmap = pixmap.scaled(self.map_label.size())
             self.map_label.setPixmap(pixmap)
         else:
             print('Error occured: ', er)
