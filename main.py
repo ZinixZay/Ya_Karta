@@ -81,13 +81,13 @@ class MainWindow(QMainWindow):
 
                 # проверки на конкретные клавииш
                 if key_event.key() == QtCore.Qt.Key.Key_Up:
-                    self.long += 0.3 * self.spn[1]
+                    self.long += self.spn[1]
                 if key_event.key() == QtCore.Qt.Key.Key_Down:
-                    self.long -= 0.3 * self.spn[1]
+                    self.long -= self.spn[1]
                 if key_event.key() == QtCore.Qt.Key.Key_Left:
-                    self.latt -= 0.3 * self.spn[0]
+                    self.latt -= self.spn[0] * 2
                 if key_event.key() == QtCore.Qt.Key.Key_Right:
-                    self.latt += 0.3 * self.spn[0]
+                    self.latt += self.spn[0] * 2
 
                 self.draw_map()
                 return True  # обязательно возвращать True после того, как нужный евент произошел
