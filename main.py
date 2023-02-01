@@ -38,6 +38,7 @@ class MainWindow(QMainWindow):
         self.spn = (0.002, 0.002)
         self.l = 'map'
 
+        self.map_view_switch.clear()
         self.map_view_switch.addItems(["Схема", "Спутник", "Гибрид"])
         self.map_view_switch.currentTextChanged.connect(self.view_change)
 
