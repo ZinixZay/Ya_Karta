@@ -38,6 +38,9 @@ class MainWindow(QMainWindow):
         self.spn = (0.002, 0.002)
         self.l = 'map'
 
+        self.map_view_switch.addItems(["Схема", "Спутник", "Гибрид"])
+        self.map_view_switch.currentTextChanged.connect(self.view_change)
+
         self.draw_map()
 
     def draw_map(self):
@@ -92,6 +95,13 @@ class MainWindow(QMainWindow):
                 self.draw_map()
                 return True  # обязательно возвращать True после того, как нужный евент произошел
         return False
+
+    def view_change(self):
+        l_param_values = {"Схема": "map",
+                          "Спутник": "sat",
+                          "Гибрид": "sat,skl"}
+        self.l = l_param_values[self.sender().currentText()]
+        self.draw_map()
 
 
 if __name__ == '__main__':
