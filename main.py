@@ -73,11 +73,13 @@ class MainWindow(QMainWindow):
             print(reply.errorString())
 
     def eventFilter(self, a0: 'QObject', a1: 'QEvent') -> bool:
-        if a1.type() == QtCore.QEvent.Type.KeyPress:
-            key_event = QtGui.QKeyEvent(a1)
+        if a1.type() == QtCore.QEvent.Type.KeyPress:  # проверка на то, что a1 - именно нажатие на клавиши
+            key_event = QtGui.QKeyEvent(a1)  # чтобы проверить нажатую кнопку, обращаться именно к этой переменной
             if key_event.key() in [QtCore.Qt.Key.Key_Up, QtCore.Qt.Key.Key_Down,
-                                   QtCore.Qt.Key.Key_Left, QtCore.Qt.Key.Key_Right]:
+                                   QtCore.Qt.Key.Key_Left, QtCore.Qt.Key.Key_Right]:  # проверка на то, что были
+                                                                                      # нажаты кнопки перемещений
 
+                # проверки на конкретные клавииш
                 if key_event.key() == QtCore.Qt.Key.Key_Up:
                     self.long += 0.3 * self.spn[1]
                 if key_event.key() == QtCore.Qt.Key.Key_Down:
@@ -88,7 +90,7 @@ class MainWindow(QMainWindow):
                     self.latt += 0.3 * self.spn[0]
 
                 self.draw_map()
-                return True
+                return True  # обязательно возвращать True после того, как нужный евент произошел
         return False
 
 
