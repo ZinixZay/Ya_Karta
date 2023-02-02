@@ -1,18 +1,13 @@
-import os
 import sys
 
-from io import BytesIO
 from enum import Enum
 from PyQt5.QtWidgets import (QApplication, QMainWindow)
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtNetwork import *
 from PyQt5.QtCore import QUrl
-from PyQt5 import uic
 from dotenv import load_dotenv
-from io import BytesIO
-from PIL import Image
-from PIL.ImageQt import ImageQt
+from screens.main_screen import Ui_MainWindow
 
 load_dotenv()
 
@@ -23,10 +18,10 @@ class ApiCategory(Enum):
     ORGANIZATION = 2
 
 
-class MainWindow(QMainWindow):
+class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
-        uic.loadUi('screens/main.ui', self)
+        self.setupUi(self)
         self.initUI()
 
     def initUI(self):
@@ -48,7 +43,7 @@ class MainWindow(QMainWindow):
         url = QUrl(self.parse_dict_to_url(ApiCategory.STATIC_MAP))
         req = QNetworkRequest(url)
         self.nam = QNetworkAccessManager()
-        self.nam.finished.connect(self.handleResponse)
+        self.nam.finished.connect(self.handle_response)
         self.nam.get(req)
 
     def parse_dict_to_url(self, category: ApiCategory) -> str:
@@ -63,7 +58,7 @@ class MainWindow(QMainWindow):
             url = url[:-1]
         return url
 
-    def handleResponse(self, reply):
+    def handle_response(self, reply):
         er = reply.error()
         if er == QNetworkReply.NoError:
             bytes_string = reply.readAll()
@@ -76,7 +71,7 @@ class MainWindow(QMainWindow):
             print('Error occured: ', er)
             print(reply.errorString())
 
-    def eventFilter(self, a0: 'QObject', a1: 'QEvent') -> bool:
+    def eventFilter(self, a0, a1) -> bool:
         if a1.type() == QtCore.QEvent.Type.KeyPress:  # проверка на то, что a1 - именно нажатие на клавиши
             key_event = QtGui.QKeyEvent(a1)  # чтобы проверить нажатую кнопку, обращаться именно к этой переменной
             if key_event.key() in [QtCore.Qt.Key.Key_Up, QtCore.Qt.Key.Key_Down,
