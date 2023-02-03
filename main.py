@@ -30,7 +30,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.map_api_server = "https://static-maps.yandex.ru/1.x/"
         self.latt, self.long = 40.984110, 56.985042
-        self.spn = (0.002, 0.002)
+        self.spn = [0.002, 0.002]
         self.l = 'map'
 
         self.map_view_switch.clear()
@@ -75,10 +75,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if a1.type() == QtCore.QEvent.Type.KeyPress:  # проверка на то, что a1 - именно нажатие на клавиши
             key_event = QtGui.QKeyEvent(a1)  # чтобы проверить нажатую кнопку, обращаться именно к этой переменной
             if key_event.key() in [QtCore.Qt.Key.Key_Up, QtCore.Qt.Key.Key_Down,
-                                   QtCore.Qt.Key.Key_Left, QtCore.Qt.Key.Key_Right]:  # проверка на то, что были
+                                   QtCore.Qt.Key.Key_Left, QtCore.Qt.Key.Key_Right,
+                                   QtCore.Qt.Key.Key_PageUp, QtCore.Qt.Key.Key_PageDown]:  # проверка на то, что были
                                                                                       # нажаты кнопки перемещений
 
                 # проверки на конкретные клавииш
+                if key_event.key() == QtCore.Qt.Key.Key_PageUp:
+                    if self.spn[0] < 25:
+                        self.spn[0] += self.spn[0]
+                        self.spn[1] += self.spn[0]
+                if key_event.key() == QtCore.Qt.Key.Key_PageDown:
+                    if self.spn[0] > 0.001:
+                        self.spn[0] = self.spn[0] / 2
+                        self.spn[1] = self.spn[0] / 2
                 if key_event.key() == QtCore.Qt.Key.Key_Up:
                     self.long += self.spn[1]
                 if key_event.key() == QtCore.Qt.Key.Key_Down:
