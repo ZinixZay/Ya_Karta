@@ -36,20 +36,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.map_view_switch.clear()
         self.map_view_switch.addItems(["Схема", "Спутник", "Гибрид"])
         self.map_view_switch.currentTextChanged.connect(self.view_change)
+        self.search_button.clicked.connect(self.search_place)
 
         self.draw_map()
 
-    def draw_map(self):
-        url = QUrl(self.parse_dict_to_url(ApiCategory.STATIC_MAP))
+    def draw_map(self, request='IT+куб+иваново'):
+        url = QUrl(self.parse_dict_to_url(ApiCategory.STATIC_MAP, request))
         req = QNetworkRequest(url)
         self.nam = QNetworkAccessManager()
         self.nam.finished.connect(self.handle_response)
         self.nam.get(req)
 
-    def parse_dict_to_url(self, category: ApiCategory) -> str:
+    def parse_dict_to_url(self, category: ApiCategory, request) -> str:
         if category == ApiCategory.STATIC_MAP:
             url = self.map_api_server + '?'
-            map_params = {'ll': f'{self.latt},{self.long}',
+            map_params = {'apikey': '40d1649f-0493-4b70-98ba-98533de7710b',
+                          'geocode': request,
+                          # 'll': f'{self.latt},{self.long}',
                           'spn': ",".join(map(str, self.spn)),
                           'l': self.l}
             for param, value in map_params.items():
@@ -107,6 +110,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                           "Гибрид": "sat,skl"}
         self.l = l_param_values[self.sender().currentText()]
         self.draw_map()
+
+    def search_place(self):
+        if self.search_bar.text():
+            self.draw_map(self.search_bar.text())
+
 
 
 if __name__ == '__main__':
