@@ -50,7 +50,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def parse_dict_to_url(self, category: ApiCategory, request) -> str:
         if category == ApiCategory.STATIC_MAP:
-            coords = self.get_coords(request).split()
+            coords = [float(i) for i in self.get_coords(request).split()]
             self.latt, self.long = coords
             url = self.map_api_server + '?'
             map_params = {'apikey': '40d1649f-0493-4b70-98ba-98533de7710b',
