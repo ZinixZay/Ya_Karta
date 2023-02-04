@@ -41,7 +41,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.draw_map()
 
-    def draw_map(self, request='IT+куб+Иваново'):
+    def draw_map(self, request='Новация'):
         url = QUrl(self.parse_dict_to_url(ApiCategory.STATIC_MAP, request))
         req = QNetworkRequest(url)
         self.nam = QNetworkAccessManager()
