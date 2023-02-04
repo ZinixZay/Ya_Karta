@@ -1,4 +1,5 @@
 import sys
+import requests
 
 from enum import Enum
 from PyQt5.QtWidgets import (QApplication, QMainWindow)
@@ -40,7 +41,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.draw_map()
 
-    def draw_map(self, request='IT+куб+иваново'):
+    def draw_map(self, request='IT+куб+Иваново'):
         url = QUrl(self.parse_dict_to_url(ApiCategory.STATIC_MAP, request))
         req = QNetworkRequest(url)
         self.nam = QNetworkAccessManager()
@@ -49,10 +50,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def parse_dict_to_url(self, category: ApiCategory, request) -> str:
         if category == ApiCategory.STATIC_MAP:
+            coords = self.get_coords(request).split()
+            self.latt, self.long = coords
             url = self.map_api_server + '?'
             map_params = {'apikey': '40d1649f-0493-4b70-98ba-98533de7710b',
-                          'geocode': request,
-                          # 'll': f'{self.latt},{self.long}',
+                          'll': f'{self.latt},{self.long}',
                           'spn': ",".join(map(str, self.spn)),
                           'l': self.l}
             for param, value in map_params.items():
@@ -114,6 +116,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def search_place(self):
         if self.search_bar.text():
             self.draw_map(self.search_bar.text())
+
+    def get_coords(self, request: str):
+        get_request = (f"http://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba"
+                      f"-98533de7710b&geocode={request}&format=json")
+        response = requests.get(get_request)
+        if response:
+            json_response = response.json()
+            toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
+            toponym_coodrinates = toponym["Point"]["pos"]
+            return toponym_coodrinates
 
 
 
