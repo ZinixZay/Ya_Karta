@@ -7,7 +7,7 @@ from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtNetwork import *
 from PyQt5.QtCore import QUrl
 
-from screens.get_coordinates import get_coords
+from core.geocoder_service import get_coords
 from screens.main_screen import Ui_MainWindow
 
 
