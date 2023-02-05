@@ -36,6 +36,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.map_view_switch.addItems(["Схема", "Спутник", "Гибрид"])
         self.map_view_switch.currentTextChanged.connect(self.view_change)
         self.search_button.clicked.connect(self.search_place)
+        self.reset_button.clicked.connect(self.reset_result)
 
         self.draw_map('Новация')
 
@@ -48,6 +49,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.nam = QNetworkAccessManager()
         self.nam.finished.connect(self.handle_response)
         self.nam.get(req)
+
+    def reset_result(self):
+        pass
 
     def parse_dict_to_url(self, category: ApiCategory, request, search=False) -> str:
         if category == ApiCategory.STATIC_MAP:
