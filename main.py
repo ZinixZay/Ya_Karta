@@ -7,7 +7,7 @@ from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtNetwork import *
 from PyQt5.QtCore import QUrl
 
-from core.geocoder_service import get_coords
+from core.geocoder_service import get_coords, get_full_address
 from screens.main_screen import Ui_MainWindow
 
 
@@ -53,11 +53,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def reset_result(self):
         self.points.clear()
         self.draw_map()
+        self.address.setText('Полный адрес объекта')
 
     def parse_dict_to_url(self, category: ApiCategory, request, search=False) -> str:
         if category == ApiCategory.STATIC_MAP:
             if search:
                 coords = [float(i) for i in get_coords(request).split()]
+                address = get_full_address(request)
+                self.address.setText(address)
                 self.points.clear()
                 self.points.append(coords)
                 self.latt, self.long = coords
