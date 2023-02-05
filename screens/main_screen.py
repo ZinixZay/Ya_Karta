@@ -45,7 +45,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.address.setText(_translate("MainWindow", "Полный адрес объекта"))
         self.search_button.setText(_translate("MainWindow", "Искать"))
-        self.map_label.setText(_translate("MainWindow", "Карта"))
+        self.map_label.setText(_translate("MainWindow", ""))
         self.map_view_switch.setItemText(0, _translate("MainWindow", "переключатель слоёв карты (схема/спутник/гибрид),"))
         self.reset_button.setText(_translate("MainWindow", "Сброс"))
         self.mail_button.setText(_translate("MainWindow", "ВКЛ/ВЫКЛ (Приписка почтового индекса)"))
