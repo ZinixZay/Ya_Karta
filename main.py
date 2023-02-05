@@ -1,6 +1,4 @@
-import os
 import sys
-import requests
 
 from enum import Enum
 from PyQt5.QtWidgets import (QApplication, QMainWindow)
@@ -8,7 +6,8 @@ from PyQt5 import QtGui, QtCore
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtNetwork import *
 from PyQt5.QtCore import QUrl
-from dotenv import dotenv_values
+
+from screens.get_coordinates import get_coords
 from screens.main_screen import Ui_MainWindow
 
 
@@ -53,7 +52,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def parse_dict_to_url(self, category: ApiCategory, request, search=False) -> str:
         if category == ApiCategory.STATIC_MAP:
             if search:
-                coords = [float(i) for i in self.get_coords(request).split()]
+                coords = [float(i) for i in get_coords(request).split()]
                 self.points.append(coords)
                 self.latt, self.long = coords
             url = self.map_api_server + '?'
@@ -121,18 +120,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def search_place(self):
         if self.search_bar.text():
             self.draw_map(self.search_bar.text())
-
-    @staticmethod
-    def get_coords(request: str):
-        api_key = dotenv_values('dot.env')['API_KEY_FOR_GEOCODER']
-        get_request = (f"http://geocode-maps.yandex.ru/1.x/?apikey={api_key}"
-                       f"&geocode={request}&format=json")
-        response = requests.get(get_request)
-        if response:
-            json_response = response.json()
-            toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
-            toponym_coodrinates = toponym["Point"]["pos"]
-            return toponym_coodrinates
 
 
 if __name__ == '__main__':
