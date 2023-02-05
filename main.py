@@ -53,6 +53,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if category == ApiCategory.STATIC_MAP:
             if search:
                 coords = [float(i) for i in get_coords(request).split()]
+                self.points.clear()
                 self.points.append(coords)
                 self.latt, self.long = coords
             url = self.map_api_server + '?'
