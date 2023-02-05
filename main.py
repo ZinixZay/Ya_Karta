@@ -60,10 +60,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                           'spn': ",".join(map(str, self.spn)),
                           'l': self.l}
             for param, value in map_params.items():
-                url += f'{param}={value}'
-                url += '&'
-            for point in self.points:
-                pass
+                url += f'{param}={value}&'
+            if self.points:
+                url += 'pt='
+                for point in self.points:
+                    url += f'{point[0]},{point[1]},pm2rdm~'
             url = url[:-1]
         return url
 
