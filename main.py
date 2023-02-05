@@ -1,5 +1,4 @@
 import sys
-import requests
 
 from enum import Enum
 from PyQt5.QtWidgets import (QApplication, QMainWindow)
@@ -7,10 +6,9 @@ from PyQt5 import QtGui, QtCore
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtNetwork import *
 from PyQt5.QtCore import QUrl
-from dotenv import load_dotenv
-from screens.main_screen import Ui_MainWindow
 
-load_dotenv()
+from screens.get_coordinates import get_coords
+from screens.main_screen import Ui_MainWindow
 
 
 class ApiCategory(Enum):
@@ -26,40 +24,48 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.initUI()
 
     def initUI(self):
-        # "self.api_key": os.getenv('API_KEY') - получить апи
         self.setFixedSize(1080, 720)
 
         self.map_api_server = "https://static-maps.yandex.ru/1.x/"
         self.latt, self.long = 40.984110, 56.985042
         self.spn = [0.002, 0.002]
         self.l = 'map'
+        self.points = list()
 
         self.map_view_switch.clear()
         self.map_view_switch.addItems(["Схема", "Спутник", "Гибрид"])
         self.map_view_switch.currentTextChanged.connect(self.view_change)
         self.search_button.clicked.connect(self.search_place)
 
-        self.draw_map()
+        self.draw_map('Новация')
 
-    def draw_map(self, request='Новация'):
-        url = QUrl(self.parse_dict_to_url(ApiCategory.STATIC_MAP, request))
+    def draw_map(self, request=None):
+        if request is not None:
+            url = QUrl(self.parse_dict_to_url(ApiCategory.STATIC_MAP, request, True))
+        else:
+            url = QUrl(self.parse_dict_to_url(ApiCategory.STATIC_MAP, request))
         req = QNetworkRequest(url)
         self.nam = QNetworkAccessManager()
         self.nam.finished.connect(self.handle_response)
         self.nam.get(req)
 
-    def parse_dict_to_url(self, category: ApiCategory, request) -> str:
+    def parse_dict_to_url(self, category: ApiCategory, request, search=False) -> str:
         if category == ApiCategory.STATIC_MAP:
-            coords = [float(i) for i in self.get_coords(request).split()]
-            self.latt, self.long = coords
+            if search:
+                coords = [float(i) for i in get_coords(request).split()]
+                self.points.clear()
+                self.points.append(coords)
+                self.latt, self.long = coords
             url = self.map_api_server + '?'
-            map_params = {'apikey': '40d1649f-0493-4b70-98ba-98533de7710b',
-                          'll': f'{self.latt},{self.long}',
+            map_params = {'ll': f'{self.latt},{self.long}',
                           'spn': ",".join(map(str, self.spn)),
                           'l': self.l}
             for param, value in map_params.items():
-                url += f'{param}={value}'
-                url += '&'
+                url += f'{param}={value}&'
+            if self.points:
+                url += 'pt='
+                for point in self.points:
+                    url += f'{point[0]},{point[1]},pm2rdm~'
             url = url[:-1]
         return url
 
@@ -82,7 +88,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if key_event.key() in [QtCore.Qt.Key.Key_Up, QtCore.Qt.Key.Key_Down,
                                    QtCore.Qt.Key.Key_Left, QtCore.Qt.Key.Key_Right,
                                    QtCore.Qt.Key.Key_PageUp, QtCore.Qt.Key.Key_PageDown]:  # проверка на то, что были
-                                                                                      # нажаты кнопки перемещений
+                # нажаты кнопки перемещений
 
                 # проверки на конкретные клавииш
                 if key_event.key() == QtCore.Qt.Key.Key_PageUp:
@@ -116,17 +122,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def search_place(self):
         if self.search_bar.text():
             self.draw_map(self.search_bar.text())
-
-    def get_coords(self, request: str):
-        get_request = (f"http://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba"
-                      f"-98533de7710b&geocode={request}&format=json")
-        response = requests.get(get_request)
-        if response:
-            json_response = response.json()
-            toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
-            toponym_coodrinates = toponym["Point"]["pos"]
-            return toponym_coodrinates
-
 
 
 if __name__ == '__main__':
