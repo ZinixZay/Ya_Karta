@@ -51,7 +51,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.nam.get(req)
 
     def reset_result(self):
-        pass
+        self.points.clear()
+        self.draw_map()
 
     def parse_dict_to_url(self, category: ApiCategory, request, search=False) -> str:
         if category == ApiCategory.STATIC_MAP:

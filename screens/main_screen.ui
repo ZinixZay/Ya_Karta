@@ -65,7 +65,7 @@
       <item row="2" column="3">
        <widget class="QPushButton" name="reset_button">
         <property name="text">
-         <string>Сброс</string>
+         <string>Сброс поискового результата</string>
         </property>
        </widget>
       </item>
