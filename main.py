@@ -1,7 +1,7 @@
 import sys
 
 from enum import Enum
-from PyQt5.QtWidgets import (QApplication, QMainWindow)
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QAction
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtNetwork import *
@@ -37,6 +37,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.map_view_switch.currentTextChanged.connect(self.view_change)
         self.search_button.clicked.connect(self.search_place)
         self.reset_button.clicked.connect(self.reset_result)
+
+        self.menu_bar = self.menuBar()
+        self.keys_menu = QMenu('Доступ к API', self)
+        self.menu_bar.addMenu(self.keys_menu)
+        self.change_geocoder = QAction(self)
+        self.change_geocoder.setText('Изменить ключ Геокодера')
+        self.change_geocoder.triggered.connect(lambda: self.api_window())
+        self.keys_menu.addAction(self.change_geocoder)
+
 
         self.draw_map('Типографская+ул.,+25/55')
 
@@ -130,6 +139,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def search_place(self):
         if self.search_bar.text():
             self.draw_map(self.search_bar.text())
+
+    def api_window(self):
+        pass
 
 
 if __name__ == '__main__':
