@@ -38,7 +38,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.search_button.clicked.connect(self.search_place)
         self.reset_button.clicked.connect(self.reset_result)
 
-        self.draw_map('Новация')
+        self.draw_map('Типографская+ул.,+25/55')
 
     def draw_map(self, request=None):
         if request is not None:
