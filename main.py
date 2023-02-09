@@ -2,7 +2,7 @@ import sys
 
 from enum import Enum
 
-from PyQt5.QtCore import QUrl
+from PyQt5.QtCore import QUrl, Qt
 from PyQt5.QtWidgets import (QApplication, QMainWindow)
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtGui import QPixmap, QImage
@@ -25,6 +25,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def initUI(self):
         self.setFixedSize(1080, 720)
+        self.setWindowFlags(Qt.FramelessWindowHint)  # Создает окно без полей.
 
         with open('core/style.css', 'r') as css_style:
             self.style = css_style.read()
@@ -43,6 +44,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.reset_button.clicked.connect(self.reset_result)
 
         self.draw_map('Типографская+ул.,+25/55')
+
+    # вызывается при нажатии кнопки мыши
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.old_pos = event.pos()
+
+    # вызывается при отпускании кнопки мыши
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.old_pos = None
+
+    # вызывается всякий раз, когда мышь перемещается
+    def mouseMoveEvent(self, event):
+        if not self.old_pos:
+            return
+        delta = event.pos() - self.old_pos
+        self.move(self.pos() + delta)
 
     def draw_map(self, request=None):
         if request is not None:
