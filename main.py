@@ -47,6 +47,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.collapse_btn.clicked.connect(lambda: self.showMinimized())
         self.close_btn.clicked.connect(lambda: self.close())
 
+        self.mail_index_enabled = False
+        self.mail_button.setText("Приписка почтового индекса: ВКЛ")
+        self.mail_button.clicked.connect(self.mail_index_enable_disable)
+
         self.draw_map('Типографская+ул.,+25/55')
 
     # вызывается при нажатии кнопки мыши
@@ -68,7 +72,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def draw_map(self, request=None):
         if request is not None:
-            url = QUrl(self.parse_dict_to_url(ApiCategory.STATIC_MAP, request, True))
+            if self.mail_index_enabled:
+                url = QUrl(self.parse_dict_to_url(ApiCategory.STATIC_MAP, request, True, True))
+            else:
+                url = QUrl(self.parse_dict_to_url(ApiCategory.STATIC_MAP, request, True))
         else:
             url = QUrl(self.parse_dict_to_url(ApiCategory.STATIC_MAP, request))
         req = QNetworkRequest(url)
@@ -81,11 +88,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.draw_map()
         self.address.setText('Полный адрес объекта')
 
-    def parse_dict_to_url(self, category: ApiCategory, request, search=False) -> str:
+    def parse_dict_to_url(self, category: ApiCategory, request, search=False, mail_ind=False) -> str:
         if category == ApiCategory.STATIC_MAP:
             if search:
                 coords = [float(i) for i in get_coords(request).split()]
-                address = get_full_address(request)
+                if mail_ind:
+                    address = get_full_address(request, True)
+                else:
+                    address = get_full_address(request)
                 self.address.setText(address)
                 self.points.clear()
                 self.points.append(coords)
@@ -156,6 +166,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def search_place(self):
         if self.search_bar.text():
             self.draw_map(self.search_bar.text())
+
+    def mail_index_enable_disable(self):
+        if self.mail_button.text() == "Приписка почтового индекса: ВКЛ":
+            self.mail_button.setText("Приписка почтового индекса: ВЫКЛ")
+            self.mail_index_enabled = True
+        elif self.mail_button.text() == "Приписка почтового индекса: ВЫКЛ":
+            self.mail_button.setText("Приписка почтового индекса: ВКЛ")
+            self.mail_index_enabled = False
+        if self.search_bar.text():
+            self.search_place()
+        else:
+            self.draw_map('Типографская+ул.,+25/55')
 
 
 if __name__ == '__main__':
