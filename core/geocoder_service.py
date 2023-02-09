@@ -15,7 +15,7 @@ def get_coords(request: str):
         return toponym_coodrinates
 
 
-def get_full_address(request: str):
+def get_full_address(request: str, mail_ind=False):
     api_key = dotenv_values('dot.env')['API_KEY_FOR_GEOCODER']
     get_request = (f"http://geocode-maps.yandex.ru/1.x/?apikey={api_key}"
                    f"&geocode={request}&format=json")
@@ -24,4 +24,11 @@ def get_full_address(request: str):
         json_response = response.json()
         toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
         toponym_address = toponym['metaDataProperty']['GeocoderMetaData']['text']
-        return toponym_address
+        if mail_ind:
+            if "postal_code" in toponym["metaDataProperty"]["GeocoderMetaData"]["Address"]:
+                mail_index = toponym["metaDataProperty"]["GeocoderMetaData"]["Address"]["postal_code"]
+                return toponym_address + ", Почтовый индекс - " + mail_index
+            else:
+                return toponym_address
+        else:
+            return toponym_address
