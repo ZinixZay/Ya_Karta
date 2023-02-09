@@ -26,6 +26,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def initUI(self):
         self.setFixedSize(1080, 720)
         self.setWindowFlags(Qt.FramelessWindowHint)  # Создает окно без полей.
+        self.setWindowTitle('YaKarta')
+        self.setWindowIcon(QtGui.QIcon('screens/metka.png'))
 
         with open('core/style.css', 'r') as css_style:
             self.style = css_style.read()
@@ -42,6 +44,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.map_view_switch.currentTextChanged.connect(self.view_change)
         self.search_button.clicked.connect(self.search_place)
         self.reset_button.clicked.connect(self.reset_result)
+        self.collapse_btn.clicked.connect(lambda: self.showMinimized())
+        self.close_btn.clicked.connect(lambda: self.close())
 
         self.draw_map('Типографская+ул.,+25/55')
 
