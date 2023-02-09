@@ -26,6 +26,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def initUI(self):
         self.setFixedSize(1080, 720)
 
+        with open('core/style.css', 'r') as css_style:
+            self.style = css_style.read()
+        self.setStyleSheet(self.style)
+
         self.map_api_server = "https://static-maps.yandex.ru/1.x/"
         self.latt, self.long = 40.984110, 56.985042
         self.spn = [0.002, 0.002]
