@@ -1,12 +1,12 @@
 import sys
 
 from enum import Enum
+
+from PyQt5.QtCore import QUrl
 from PyQt5.QtWidgets import (QApplication, QMainWindow)
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtNetwork import *
-from PyQt5.QtCore import QUrl
-
 from core.geocoder_service import get_coords, get_full_address
 from screens.main_screen import Ui_MainWindow
 
