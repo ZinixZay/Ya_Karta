@@ -7,9 +7,9 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow)
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtNetwork import *
-from core.geocoder_service import get_coords, get_full_address
+from core.geocoder_service import *
 from screens.main_screen import Ui_MainWindow
-
+from core.organization_service import *
 
 class ApiCategory(Enum):
     STATIC_MAP = 0
@@ -51,7 +51,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.mail_button.setText("Приписка почтового индекса: ВКЛ")
         self.mail_button.clicked.connect(self.mail_index_enable_disable)
 
-        self.draw_map('Типографская+ул.,+25/55')
+        self.draw_map('Типографская 25/55')
 
     # вызывается при нажатии кнопки мыши
     def mousePressEvent(self, event):
@@ -151,6 +151,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     self.latt -= self.spn[0] * 2
                 if key_event.key() == QtCore.Qt.Key.Key_Right:
                     self.latt += self.spn[0] * 2
+        elif a1.type() == QtCore.QEvent.Type.MouseButtonPress and a0 == self.map_label:
+            if a1.button() == QtCore.Qt.MouseButton.LeftButton:
+
+                width = self.map_label.width()
+                height = self.map_label.height()
+
+                longitude_per_pixel = self.spn[0] / (width / 2)
+                latitude_per_pixel = self.spn[1] / (height / 2)
+
+                d_x_pixels = a1.pos().x() - width / 2
+                d_y_pixels = - (a1.pos().y() - height / 2)
+
+                click_latt = self.latt + d_x_pixels * latitude_per_pixel
+                click_long = self.long + d_y_pixels * longitude_per_pixel
+
+                self.draw_map(get_address((click_long, click_latt)))
 
                 self.draw_map()
                 return True  # обязательно возвращать True после того, как нужный евент произошел
