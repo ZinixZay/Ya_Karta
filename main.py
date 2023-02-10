@@ -152,6 +152,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     self.latt -= self.spn[0] * 2
                 if key_event.key() == QtCore.Qt.Key.Key_Right:
                     self.latt += self.spn[0] * 2
+                self.draw_map()
+                return True
+
         elif a1.type() == QtCore.QEvent.Type.MouseButtonPress and a0 == self.map_label:
             if a1.button() == QtCore.Qt.MouseButton.LeftButton:
 
@@ -171,7 +174,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
                 self.draw_map(self.search_address)
 
-                self.draw_map()
                 return True  # обязательно возвращать True после того, как нужный евент произошел
         return False
 
