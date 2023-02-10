@@ -71,12 +71,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         delta = event.pos() - self.old_pos
         self.move(self.pos() + delta)
 
-    def draw_map(self, request=None):
+    def draw_map(self, request=None, move=True):
         if request is not None:
             if self.mail_index_enabled:
-                url = QUrl(self.parse_dict_to_url(ApiCategory.STATIC_MAP, request, True, True))
+                url = QUrl(self.parse_dict_to_url(ApiCategory.STATIC_MAP, request, True, True, move=move))
             else:
-                url = QUrl(self.parse_dict_to_url(ApiCategory.STATIC_MAP, request, True))
+                url = QUrl(self.parse_dict_to_url(ApiCategory.STATIC_MAP, request, True, move=move))
         else:
             url = QUrl(self.parse_dict_to_url(ApiCategory.STATIC_MAP, request))
         req = QNetworkRequest(url)
@@ -89,7 +89,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.draw_map()
         self.address.setText('Полный адрес объекта')
 
-    def parse_dict_to_url(self, category: ApiCategory, request, search=False, mail_ind=False) -> str:
+    def parse_dict_to_url(self, category: ApiCategory, request, search=False, mail_ind=False, move=True) -> str:
         if category == ApiCategory.STATIC_MAP:
             if search:
                 coords = [float(i) for i in get_coords(request).split()]
@@ -100,7 +100,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.address.setText(address)
                 self.points.clear()
                 self.points.append(coords)
-                self.latt, self.long = coords
+                if move:
+                    self.latt, self.long = coords
             url = self.map_api_server + '?'
             map_params = {'ll': f'{self.latt},{self.long}',
                           'spn': ",".join(map(str, self.spn)),
@@ -172,7 +173,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
                 self.search_address = get_address((click_long, click_latt))
 
-                self.draw_map(self.search_address)
+                self.draw_map(self.search_address, move=False)
 
                 return True  # обязательно возвращать True после того, как нужный евент произошел
         return False
