@@ -38,6 +38,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.spn = [0.002, 0.002]
         self.l = 'map'
         self.points = list()
+        self.search_address = 'Типографская 25/55'
 
         self.map_view_switch.clear()
         self.map_view_switch.addItems(["Схема", "Спутник", "Гибрид"])
@@ -51,7 +52,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.mail_button.setText("Приписка почтового индекса: ВКЛ")
         self.mail_button.clicked.connect(self.mail_index_enable_disable)
 
-        self.draw_map('Типографская 25/55')
+        self.draw_map(self.search_address)
 
     # вызывается при нажатии кнопки мыши
     def mousePressEvent(self, event):
@@ -166,7 +167,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 click_latt = self.latt + d_x_pixels * latitude_per_pixel
                 click_long = self.long + d_y_pixels * longitude_per_pixel
 
-                self.draw_map(get_address((click_long, click_latt)))
+                self.search_address = get_address((click_long, click_latt))
+
+                self.draw_map(self.search_address)
 
                 self.draw_map()
                 return True  # обязательно возвращать True после того, как нужный евент произошел
@@ -193,7 +196,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.search_bar.text():
             self.search_place()
         else:
-            self.draw_map('Типографская+ул.,+25/55')
+            self.draw_map(self.search_address)
 
 
 if __name__ == '__main__':
