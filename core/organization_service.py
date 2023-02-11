@@ -14,8 +14,6 @@ def get_organization(coords: tuple, spn: tuple) -> typing.Union[None, str]:
     if response:
         json_response = response.json()
         try:
-            print(json_response)
-            print(spn)
             return json_response['features'][0]['properties']['CompanyMetaData']['address']
         except KeyError:
             return None
