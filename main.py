@@ -1,6 +1,7 @@
 import sys
 
 from enum import Enum
+import math
 
 from PyQt5.QtCore import QUrl, Qt
 from PyQt5.QtWidgets import (QApplication, QMainWindow)
@@ -10,6 +11,7 @@ from PyQt5.QtNetwork import *
 from core.geocoder_service import *
 from screens.main_screen import Ui_MainWindow
 from core.organization_service import *
+
 
 class ApiCategory(Enum):
     STATIC_MAP = 0
@@ -52,6 +54,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.mail_button.setText("Приписка почтового индекса: ВКЛ")
         self.mail_button.clicked.connect(self.mail_index_enable_disable)
 
+        self.old_pos = None
         self.draw_map(self.search_address)
 
     # вызывается при нажатии кнопки мыши
@@ -158,24 +161,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         elif a1.type() == QtCore.QEvent.Type.MouseButtonPress and a0 == self.map_label:
             if a1.button() == QtCore.Qt.MouseButton.LeftButton:
-
-                width = self.map_label.width()
-                height = self.map_label.height()
-
-                longitude_per_pixel = self.spn[0] / (width / 2)
-                latitude_per_pixel = self.spn[1] / (height / 2)
-
-                d_x_pixels = a1.pos().x() - width / 2
-                d_y_pixels = - (a1.pos().y() - height / 2)
-
-                click_latt = self.latt + d_x_pixels * latitude_per_pixel
-                click_long = self.long + d_y_pixels * longitude_per_pixel
+                click_long, click_latt = self.get_click_coords((a1.pos().x(), a1.pos().y()))
 
                 self.search_address = get_address((click_long, click_latt))
 
                 self.draw_map(self.search_address, move=False)
 
                 return True  # обязательно возвращать True после того, как нужный евент произошел
+            if a1.button() == QtCore.Qt.MouseButton.RightButton:
+                click_long, click_latt = self.get_click_coords((a1.pos().x(), a1.pos().y()))
+                organisation_name = get_organization((click_latt, click_long), self.get_coords_from_metres((50, 50)))
+                if organisation_name:
+                    self.draw_map(organisation_name, move=False)
+                else:
+                    self.reset_result()
+                return True
         return False
 
     def view_change(self):
@@ -200,6 +200,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.search_place()
         else:
             self.draw_map(self.search_address)
+
+    def get_coords_from_metres(self, metres: tuple[int, int]) -> tuple[float, float]:
+        earth_r = 6378137
+        metre_per_long_degree = 111300
+        metre_per_latt_degree = math.radians(1) * earth_r * math.cos(math.radians(self.long))
+        return metres[0] / metre_per_long_degree, metres[1] / metre_per_latt_degree
+
+    def get_click_coords(self, mouse_pos: tuple[int, int]) -> tuple[float, float]:
+        width = self.map_label.width()
+        height = self.map_label.height()
+
+        longitude_per_pixel = self.spn[0] / (width / 2)
+        latitude_per_pixel = self.spn[1] / (height / 2)
+
+        d_x_pixels = mouse_pos[0] - width / 2
+        d_y_pixels = - (mouse_pos[1] - height / 2)
+
+        click_latt = self.latt + d_x_pixels * latitude_per_pixel
+        click_long = self.long + d_y_pixels * longitude_per_pixel
+        return click_long, click_latt
 
 
 if __name__ == '__main__':
