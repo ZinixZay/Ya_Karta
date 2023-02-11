@@ -51,7 +51,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.close_btn.clicked.connect(lambda: self.close())
 
         self.mail_index_enabled = False
-        self.mail_button.setText("Приписка почтового индекса: ВКЛ")
+        self.mail_button.setText("Приписка почтового индекса: ВЫКЛ")
         self.mail_button.clicked.connect(self.mail_index_enable_disable)
 
         self.old_pos = None
@@ -195,11 +195,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.draw_map(self.search_bar.text())
 
     def mail_index_enable_disable(self):
-        if self.mail_button.text() == "Приписка почтового индекса: ВКЛ":
-            self.mail_button.setText("Приписка почтового индекса: ВЫКЛ")
-            self.mail_index_enabled = True
-        elif self.mail_button.text() == "Приписка почтового индекса: ВЫКЛ":
+        if self.mail_button.text() == "Приписка почтового индекса: ВЫКЛ":
             self.mail_button.setText("Приписка почтового индекса: ВКЛ")
+            self.mail_index_enabled = True
+        elif self.mail_button.text() == "Приписка почтового индекса: ВКЛ":
+            self.mail_button.setText("Приписка почтового индекса: ВЫКЛ")
             self.mail_index_enabled = False
         if self.search_bar.text():
             self.search_place()
