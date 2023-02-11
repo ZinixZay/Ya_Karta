@@ -8,9 +8,9 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow)
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtNetwork import *
-from core.geocoder_service import *
+from core import geocoder_service
 from screens.main_screen import Ui_MainWindow
-from core.organization_service import *
+from core import organization_service
 
 
 class ApiCategory(Enum):
@@ -55,6 +55,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.mail_button.clicked.connect(self.mail_index_enable_disable)
 
         self.old_pos = None
+        self.is_organization_search = False
         self.draw_map(self.search_address)
 
     # вызывается при нажатии кнопки мыши
@@ -95,11 +96,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def parse_dict_to_url(self, category: ApiCategory, request, search=False, mail_ind=False, move=True) -> str:
         if category == ApiCategory.STATIC_MAP:
             if search:
-                coords = [float(i) for i in get_coords(request).split()]
-                if mail_ind:
-                    address = get_full_address(request, True)
+                coords = [float(i) for i in geocoder_service.get_coords(request).split()]
+                if not self.is_organization_search:
+                    address = geocoder_service.get_full_address(request, mail_ind)
                 else:
-                    address = get_full_address(request)
+                    address = organization_service.get_full_name(request, mail_ind)
                 self.address.setText(address)
                 self.points.clear()
                 self.points.append(coords)
@@ -161,16 +162,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         elif a1.type() == QtCore.QEvent.Type.MouseButtonPress and a0 == self.map_label:
             if a1.button() == QtCore.Qt.MouseButton.LeftButton:
+                self.is_organization_search = False
                 click_long, click_latt = self.get_click_coords((a1.pos().x(), a1.pos().y()))
 
-                self.search_address = get_address((click_long, click_latt))
+                self.search_address = geocoder_service.get_address((click_long, click_latt))
 
                 self.draw_map(self.search_address, move=False)
 
                 return True  # обязательно возвращать True после того, как нужный евент произошел
             if a1.button() == QtCore.Qt.MouseButton.RightButton:
+                self.is_organization_search = True
                 click_long, click_latt = self.get_click_coords((a1.pos().x(), a1.pos().y()))
-                organisation_name = get_organization((click_latt, click_long), self.get_coords_from_metres((50, 50)))
+                organisation_name = organization_service.get_organization((click_long, click_latt),
+                                                                          self.get_coords_from_metres((50, 50)))
                 if organisation_name:
                     self.draw_map(organisation_name, move=False)
                 else:
@@ -186,6 +190,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.draw_map()
 
     def search_place(self):
+        self.is_organization_search = False
         if self.search_bar.text():
             self.draw_map(self.search_bar.text())
 
